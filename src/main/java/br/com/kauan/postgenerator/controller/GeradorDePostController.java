@@ -2,7 +2,7 @@ package br.com.kauan.postgenerator.controller;
 
 import br.com.kauan.postgenerator.domain.chatclient.ChatClientService;
 import br.com.kauan.postgenerator.domain.posts.Post;
-import br.com.kauan.postgenerator.domain.posts.PostagemGeradaResponse;
+import br.com.kauan.postgenerator.utils.PromptUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,25 +24,24 @@ public class GeradorDePostController {
         this.chatService = chatService;
     }
 
-    private String higienizar(String textoPost) {
-        textoPost.replace("\n", "").replace("\\n", "");
-        return textoPost;
-    }
-
     @PostMapping
     public ResponseEntity<String> gerarPostagem(@RequestBody Post post) throws IOException {
-        String promptUsuario = ChatClientService.formatarPromptUsuario(post);
+        String promptUsuario = PromptUtils.formatarPromptUsuario(post);
 
         String textoPost = chatService.chatGerarPost(promptUsuario);
         String postFormatado = chatService.chatFormatarPost(textoPost.translateEscapes());
         byte[] imagemGerada = chatService.chatGerarImagem(textoPost, post);
 
         String base64Imagem = Base64.getEncoder().encodeToString(imagemGerada);
-        String htmlCompleto = ChatClientService.formatarResultado(postFormatado, base64Imagem);
-
+        salvarImagem(imagemGerada);
+        String htmlCompleto = PromptUtils.formatarResultado(postFormatado, base64Imagem);
         salvarHtml(htmlCompleto);
 
         return ResponseEntity.ok(htmlCompleto);
+    }
+
+    private static void salvarImagem(byte[] imagemGerada) throws IOException {
+        Files.write(Paths.get("imagens-geradas", UUID.randomUUID() + ".png"), imagemGerada);
     }
 
     private static void salvarHtml(String htmlCompleto) throws IOException {
