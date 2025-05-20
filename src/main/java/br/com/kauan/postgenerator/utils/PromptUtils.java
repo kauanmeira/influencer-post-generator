@@ -2,11 +2,13 @@ package br.com.kauan.postgenerator.utils;
 
 import br.com.kauan.postgenerator.domain.posts.Post;
 import org.springframework.boot.json.JsonParseException;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+@Component
 public class PromptUtils {
 
     public static String gerarPrompt(String textoPost, Post post, String imageSystem) {

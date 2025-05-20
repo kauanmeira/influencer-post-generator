@@ -41,12 +41,12 @@ public class GeradorDePostController {
     }
 
     private static void salvarImagem(byte[] imagemGerada) throws IOException {
-        Files.write(Paths.get("imagens-geradas", UUID.randomUUID() + ".png"), imagemGerada);
+        Files.write(Paths.get("src/main/resources/imagens-geradas", UUID.randomUUID() + ".png"), imagemGerada);
     }
 
     private static void salvarHtml(String htmlCompleto) throws IOException {
         String id = UUID.randomUUID().toString();
-        Path caminho = Paths.get("posts-gerados", id + ".html");
+        Path caminho = Paths.get("src/main/resources/posts-gerados", id + ".html");
         Files.createDirectories(caminho.getParent());
         Files.writeString(caminho, htmlCompleto);
     }
@@ -54,7 +54,7 @@ public class GeradorDePostController {
 
     @GetMapping(value = "/imagem/{id}", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getImagem(@PathVariable String id) throws IOException {
-        Path caminho = Paths.get("imagens-geradas", id + ".png");
+        Path caminho = Paths.get("src/main/resources/imagens-geradas", id + ".png");
 
         if (!Files.exists(caminho)) {
             return ResponseEntity.notFound().build();
